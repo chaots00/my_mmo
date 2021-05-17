@@ -1,5 +1,5 @@
 module.exports = async (db) => {
-  const collectionName = "classe";
+  const collectionName = "item";
   const existingCollections = await db.listCollections().toArray();
   if (existingCollections.some((c) => c.name === collectionName)) {
     return;
