@@ -8,6 +8,8 @@ const passport = require('passport');
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+
 (async () => {
     app.use('^/api', passport.authenticate('jwt',{session:false}));
     const db = await databaseConnexion();
