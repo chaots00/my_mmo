@@ -25,8 +25,24 @@ module.exports = async (db) => {
             description: "must be a string and is required",
           },
           classe: {
-            bsonType: "string",
-            description: "must be a string and is required",
+            bsonType: "objectId",
+            description: "must be a objectId and is required",
+          },
+          main: {
+            bsonType: "objectId",
+            description: "must be a objectId and is required",
+          },
+          niv: {
+            bsonType: "integer",
+            description: "must be a integer and is required",
+          },
+          xp: {
+            bsonType: "integer",
+            description: "must be a integer and is required",
+          },
+          argent: {
+            bsonType: "integer",
+            description: "must be a integer and is required",
           },
           sac: {
             bsonType: "array",
@@ -35,8 +51,8 @@ module.exports = async (db) => {
               required: ["item",],
               properties: {
                 item: {
-                  bsonType: "string",
-                  description: "must be a string and is required",
+                  bsonType: "objectId",
+                  description: "must be a objectId and is required",
                 },
               },
             },

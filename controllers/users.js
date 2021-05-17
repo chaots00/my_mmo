@@ -35,6 +35,31 @@ module.exports = (app, db) => {
   });
 
   app.post("/api/users", async (req, res) => {
+    const schema = Joi.object({
+      pseudo: Joi.string()
+            .alphanum()
+            .min(3)
+            .max(30)
+            .required(),
+    
+       password: Joi.string()
+       .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+       .required(),
+    
+       classe: Joi.string() 
+       .required(),
+    
+       mail: Joi.string()
+            .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+            .required(),
+    
+    })
+    
+    .with("mail","password")
+    .with("pseudo","classe");
+    
+    schema.validate({mail:"abc@hotmail.com",pseudo:"abc"});
+
     const data = req.body;
      data.classe = new ObjectID(data.classe);
      data.main = new ObjectID(data.main);
