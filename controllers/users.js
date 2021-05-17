@@ -221,23 +221,7 @@ module.exports = (app, db) => {
           item: '$sac.item',
           _id: '$sac._id',
         }},
-        { $project: {item: 1,}},
-    ]).toArray();
-
-    res.json(sac);
-  });
-
-
-
-
-  // Récuperation de toutes les item
-  app.get("/api/users/:userId/sac", async (req, res) => {
-    const { userId } = req.params;
-
-    const sac = await userCollection.aggregate([
-        { $match: {_id: new ObjectID(userId) }},
-        { $unwind: '$sac' },
-        { $project: {sac: 1, _id: 1}},
+        { $project: {item: 1,sac:1}},
     ]).toArray();
 
     res.json(sac);
@@ -268,32 +252,5 @@ app.get("/api/users/:userId", async (req, res) => {
   res.json(usersf);
 });
 
-const schema = Joi.object({
-  pseudo: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
-        .required(),
-
-   password: Joi.string()
-   .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-   .required(),
-
-   classe: Joi.string() 
-   .required(),
-
-   mail: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
-        .required(),
-
-})
-
-.with("mail","password")
-.with("pseudo","classe");
-
-schema.validate({mail:"abc@hotmail.com",pseudo:"abc"});
   
-
-
-
 };

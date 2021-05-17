@@ -19,12 +19,8 @@ module.exports = async (db) => {
           bsonType: "array",
           items: {
             bsonType: "object",
-            required: ["nom","effet","type","prix_vente","prix_achat"],
+            required: ["effet","type","prix_vente","prix_achat"],
             properties: {
-              nom: {
-                bsonType: "string",
-                description: "must be a string and is required",
-              },
               effet: {
                 bsonType: "string",
                 description: "must be a string and is required",
