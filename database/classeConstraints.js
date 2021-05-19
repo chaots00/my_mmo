@@ -1,7 +1,9 @@
 module.exports = async (db) => {
+  
   const collectionName = "classe";
   const existingCollections = await db.listCollections().toArray();
   if (existingCollections.some((c) => c.name === collectionName)) {
+    
     return;
   }
   
@@ -27,7 +29,7 @@ module.exports = async (db) => {
                   description: "must be a string and is required",
                 },
                 obtention: {
-                  bsonType: "integer",
+                  bsonType: "int",
                   description: "must be a integer and is required",
                 },
                 element: {

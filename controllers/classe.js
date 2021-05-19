@@ -10,6 +10,7 @@ module.exports = (app, db) => {
     const data = req.body;
     
     data.nom 
+    console.log(data);
 
     const response = await classeCollection.insertOne(data);
     
@@ -34,7 +35,7 @@ module.exports = (app, db) => {
         $push: {
           competences: {
             nom,
-            obtention,
+            obtention : parseInt(obtention),
             element,
             effet,
             _id: new ObjectID(),
@@ -45,7 +46,6 @@ module.exports = (app, db) => {
         returnOriginal: false,
       }
     );
-
     res.json(value);
   });
 

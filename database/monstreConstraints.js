@@ -17,7 +17,7 @@ module.exports = async (db) => {
             description: "must be a string and is required",
           },
           pv: {
-            bsonType: "integer",
+            bsonType: "int",
             description: "must be a integer and is required",
           },
           type: {
@@ -25,11 +25,11 @@ module.exports = async (db) => {
             description: "must be a string and is required",
           },
           exp: {
-            bsonType: "integer",
+            bsonType: "int",
             description: "must be a integer and is required",
           },
           dega: {
-            bsonType: "interger",
+            bsonType: "int",
             description: "must be a integer and is required",
           },
           item: {

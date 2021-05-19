@@ -13,7 +13,11 @@ const getDb = async () => {
   try {
     const client = await MongoClient.connect(url, { useUnifiedTopology: true });
     db = client.db(dbName);
-    await userConstraints(db);await classeConstraints(db);await monstreConstraints(db); await pnjConstraints(db);await itemConstraints(db);
+   await userConstraints(db);
+    await classeConstraints(db);
+    await monstreConstraints(db); 
+    await pnjConstraints(db);
+    await itemConstraints(db);
   } catch (error) {
     console.error(error);
   }

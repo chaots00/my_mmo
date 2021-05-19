@@ -10,7 +10,7 @@ module.exports = async (db) => {
     validator: {
       $jsonSchema: {
         bsonType: "object",
-        required: ["mail","password","pseudo", "classe"],
+        required: ["mail","password","pseudo"],
         properties: {
           mail: {
             bsonType: "string",
@@ -33,16 +33,22 @@ module.exports = async (db) => {
             description: "must be a objectId and is required",
           },
           niv: {
-            bsonType: "integer",
-            description: "must be a integer and is required",
-          },
+            bsonType: "int",
+            minimum: 0,
+            maximum: 100,
+            description: 'must be an integer in [ 0, 100 ] and is required',
+          }, 
           xp: {
-            bsonType: "integer",
-            description: "must be a integer and is required",
+            bsonType: "int",
+            minimum: 0,
+            maximum: 100000,
+            description: 'must be an integer in [ 0, 10000] and is required',
           },
           argent: {
-            bsonType: "integer",
-            description: "must be a integer and is required",
+            bsonType: "int",
+            minimum: 0,
+            maximum: 1000000,
+            description: 'must be an integer in [ 0, 1000000 ] and is required',
           },
           sac: {
             bsonType: "array",

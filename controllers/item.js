@@ -9,11 +9,10 @@ module.exports = (app, db) => {
   const addItem = async(req, res)  => {
     const data = req.body;
     
-    data.nom 
-    data.effet  
-    data.type
-    data.prix_vente  
-    data.prix_achat  
+    
+    
+    data.prix_vente  = parseInt(data.prix_vente);
+    data.prix_achat  = parseInt(data.prix_achat);
 
     const response = await itemCollection.insertOne(data);
 

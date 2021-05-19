@@ -10,12 +10,12 @@ module.exports = (app, db) => {
   const addmonstre = async(req, res)  => {
     const data = req.body;
     
-    data.nom 
-    data.pv 
-    data.type 
-    data.item = new ObjectID()
-    data.dega
-
+  
+    data.item = new ObjectID(data.item);
+    data.pv = parseInt(data.pv);
+    data.exp = parseInt(data.exp);
+    data.dega = parseInt(data.dega);
+console.log(data);
     const response = await monstreCollection.insertOne(data);
     
 

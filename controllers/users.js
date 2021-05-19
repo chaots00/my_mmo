@@ -1,70 +1,80 @@
 const { Db, ObjectID } = require("mongodb");
 const bcrypt = require('bcrypt');
-const passport = require ('passport');
+const passport = require('passport');
 const saltRound = 10;
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 
 
 module.exports = (app, db) => {
-  if (!(db instanceof Db)) { 
+  if (!(db instanceof Db)) {
     throw new Error("Invalid Database");
   }
   const userCollection = db.collection("users");
 
-  app.post('/login',async (req , res)=>{
-    passport.authenticate('local',{session: false},(err,user)=>{
-      if(err || user ){
+  app.post('/login', async (req, res) => {
+    passport.authenticate('local', { session: false }, (err, user) => {
+      if (err || user) {
         return res.status(400).json({
           message: "sommeting is not right",
-          user : user
+          user: user
         });
       }
 
-      req.login(user,{session:false},(err)=>{
-        if(err){
+      req.login(user, { session: false }, (err) => {
+        if (err) {
           return res.send(err);
         }
 
-        const token = jwt.sign(user,"maSignature");
+        const token = jwt.sign(user, "maSignature");
 
-        return res.json({user,token});
+        return res.json({ user, token });
 
       });
-    })(req,res)
+    })(req, res)
   });
 
   app.post("/api/users", async (req, res) => {
     const schema = Joi.object({
       pseudo: Joi.string()
-            .alphanum()
-            .min(3)
-            .max(30)
-            .required(),
-    
-       password: Joi.string()
-       .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-       .required(),
-    
-       classe: Joi.string() 
-       .required(),
-    
-       mail: Joi.string()
-            .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
-            .required(),
-    
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required(),
+
+      password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+        .required(),
+
+      mail: Joi.string()
+        .email()
+        .required(),
+
+      classe: Joi.string(),
+      niv: Joi.number(),
+      xp:Joi.number(),
+      main:Joi.string(),
+      argent:Joi.number(),
+
     })
-    
-    .with("mail","password")
-    .with("pseudo","classe");
-    
-    schema.validate({mail:"abc@hotmail.com",pseudo:"abc"});
+      .with("mail", "password");
+      
+      const{error} = schema.validate(req.body);
+        
+      if(error != null){
+          const firstError = error.details[0];
+          return res.status(400).json({error : firstError.message})
+      }
 
     const data = req.body;
-     data.classe = new ObjectID(data.classe);
-     data.main = new ObjectID(data.main);
+    data.classe = new ObjectID(data.classe);
+    data.main = new ObjectID(data.main);
+    data.niv = parseInt(data.niv);
+    data.xp = parseInt(data.xp);
+    data.argent = parseInt(data.argent);
+    console.log(data);
     try {
-      data.password = bcrypt.hashSync (data.password, saltRound);
+      data.password = bcrypt.hashSync(data.password, saltRound);
       const response = await db.collection("users").insertOne(data,);
       if (response.result.n !== 1 && response.result.ok !== 1) {
         return res.status(400).json({ error: "impossible to create the user" });
@@ -73,8 +83,8 @@ module.exports = (app, db) => {
       delete user.password;
 
       res.json(user);
-      
-    } catch(e) {
+
+    } catch (e) {
       console.log(e);
       return res.status(400).json({ error: "impossible to create the user" });
     }
@@ -82,7 +92,7 @@ module.exports = (app, db) => {
   });
 
   // lister tous les utilisateurs
-  app.get("/api/users",  async (req, res) => {
+  app.get("/api/users", async (req, res) => {
     const users = await userCollection.find().toArray();
 
     res.json(users);
@@ -101,7 +111,7 @@ module.exports = (app, db) => {
     res.json(user);
   });
 
- 
+
 
   // Mettre à jour un utilisateur
   app.post("/api/users/:userId", async (req, res) => {
@@ -186,7 +196,7 @@ module.exports = (app, db) => {
   // Modifier un item
   app.post("/api/users/:userId/sac/:sacId", async (req, res) => {
     const { userId, sacId } = req.params;
-    const { item,  } = req.body;
+    const { item, } = req.body;
     const _id = new ObjectID(userId);
     const _sacId = new ObjectID(sacId);
 
@@ -196,9 +206,9 @@ module.exports = (app, db) => {
         'sac._id': _sacId
       },
       {
-        $set: { 
-          'sac.$.item' : item,
-         },
+        $set: {
+          'sac.$.item': item,
+        },
       },
       {
         returnOriginal: false,
@@ -214,43 +224,49 @@ module.exports = (app, db) => {
     const { userId } = req.params;
 
     const sac = await userCollection.aggregate([
-        { $match: {_id: new ObjectID(userId) }},
-        { $unwind: '$sac' },
-        { $project: {sac: 1, _id: 0}},
-        { $addFields: {
+      { $match: { _id: new ObjectID(userId) } },
+      { $unwind: '$sac' },
+      { $project: { sac: 1, _id: 0 } },
+      {
+        $addFields: {
           item: '$sac.item',
           _id: '$sac._id',
-        }},
-        { $project: {item: 1,sac:1}},
+        }
+      },
+      { $project: { item: 1, sac: 1 } },
     ]).toArray();
 
     res.json(sac);
   });
-// recuperé toute les info 
-app.get("/api/users/:userId", async (req, res) => {
-  const { userId } = req.params;
+  // recuperé toute les info 
+  app.get("/api/users/:userId", async (req, res) => {
+    const { userId } = req.params;
 
-  const usersf = await userCollection.aggregate([
-      { $match: {_id: new ObjectID(userId) }},
-      {$lookup: {
-        from: 'classe',
-        localField: 'users',
-        foreignField: 'users',
-        as: 'classe'
-      }},
-      {$lookup: {
-        from: 'item',
-        localField: 'users',
-        foreignField: 'users',
-        as: 'main'
-      }},
+    const usersf = await userCollection.aggregate([
+      { $match: { _id: new ObjectID(userId) } },
+      {
+        $lookup: {
+          from: 'classe',
+          localField: 'users',
+          foreignField: 'users',
+          as: 'classe'
+        }
+      },
+      {
+        $lookup: {
+          from: 'item',
+          localField: 'users',
+          foreignField: 'users',
+          as: 'main'
+        }
+      },
       { $unwind: '$classe' },
       { $unwind: '$main' },
-      { $project: {classe: 1,pseudo:1,main:1,argent:1,xp:1,niv:1, _id: 1}},
-  ]).toArray();
+      { $project: { classe: 1, pseudo: 1, main: 1, argent: 1, xp: 1, niv: 1, _id: 1 } },
+    ]).toArray();
 
-  res.json(usersf);
-});
+    res.json(usersf);
+  });
 
-  
+
 };
